@@ -1,4 +1,5 @@
 import os
+import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any
@@ -11,14 +12,22 @@ from datetime import datetime, timezone
 
 app = FastAPI()
 
+def download_model_from_gdrive(file_id, dest_path):
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    response = requests.get(url)
+    with open(dest_path, 'wb') as f:
+        f.write(response.content)
+
 def load_model_presence():
     model_path = "modeling/model_presence.joblib"
-    if os.path.exists(model_path):
-        print("Model presence ditemukan")
-        return load(model_path)
+    if not os.path.exists(model_path):
+        print("Mengunduh model dari GDrive...")
+        file_id = "1nWUhcG4Uyotk_zbvi_LfnchPcCKgAp9f"
+        download_model_from_gdrive(file_id, model_path)
     else:
-        print("Model presence tidak ditemukan, lanjut tanpa model.")
-        return None
+        print("Model presence sudah tersedia.")
+
+    return load(model_path)
 
 # Load model
 model_presence = load_model_presence()
