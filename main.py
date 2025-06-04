@@ -10,8 +10,17 @@ from datetime import datetime, timezone
 
 app = FastAPI()
 
+def load_model_presence():
+    model_path = "modeling/model_presence.joblib"
+    if os.path.exits(model_path):
+        print("Model presence ditemukan")
+        return load(model_path)
+    else:
+        print("Model presence tidak ditemukan, lanjut tanpa model.")
+        return None
+
 # Load model
-model_presence = load("modeling/model_presence.joblib")
+model_presence = load_model_presence()
 model_risk = load("modeling/model_risk.joblib")
 
 # Load encoders
@@ -111,6 +120,9 @@ def predict_risk(data: RiskInput):
     
 @app.post("/predict-presence")
 def predict_presence(data: PresenceInput):
+    if model_presence is None:
+        raise HTTPException(status_code=500, detail="Model presence tidak tersedia di server")
+    
     try:
         df = pd.DataFrame([data.dict()])
         df_transformed = pd.DataFrame({
