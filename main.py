@@ -1,5 +1,6 @@
 import os
 import requests
+import gdown
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any
@@ -14,9 +15,7 @@ app = FastAPI()
 
 def download_model_from_gdrive(file_id, dest_path):
     url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    response = requests.get(url)
-    with open(dest_path, 'wb') as f:
-        f.write(response.content)
+    gdown.download(url, dest_path, quiet=False)
 
 def load_model_presence():
     model_path = "modeling/model_presence.joblib"
