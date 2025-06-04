@@ -12,7 +12,7 @@ app = FastAPI()
 
 def load_model_presence():
     model_path = "modeling/model_presence.joblib"
-    if os.path.exits(model_path):
+    if os.path.exists(model_path):
         print("Model presence ditemukan")
         return load(model_path)
     else:
