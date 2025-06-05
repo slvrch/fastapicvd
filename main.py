@@ -153,3 +153,28 @@ def predict_presence(data: PresenceInput):
         return {"prediction": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save-prediction")
+def save_prediction(data: dict):
+    try:
+        nama = data.get("nama")
+        email = data.get("email")
+        no_tlp = data.get("no_tlp")
+        target = data.get("target")
+        hasil_prediksi = data.get("hasil_prediksi")
+
+        response = supabase.table("predictions").insert({
+            "nama": nama,
+            "email": email,
+            "no_tlp": no_tlp,
+            "target": target,
+            "hasil_prediksi": hasil_prediksi,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }).execute()
+
+        if getattr(response, "error", None) is None:
+            return {"status": "success", "message": "Prediksi berhasil disimpan."}
+        else:
+            raise HTTPException(status_code=500, detail="Gagal menyimpan ke Supabase")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 
