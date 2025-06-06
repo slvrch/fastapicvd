@@ -122,8 +122,8 @@ def predict_risk(data: RiskInput):
             "Resting_HR":scaler_Resting_HR_risk.transform(df[["Resting_HR"]])[:, 0]
         })
         pred = model_risk.predict(df_transformed)
-        result = result_target_risk.inverse_transform(pred)[0]
-        return {"prediction": result}
+        result_risk = result_target_risk.inverse_transform(pred)[0]
+        return {"prediction": result_risk}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -149,8 +149,8 @@ def predict_presence(data: PresenceInput):
             "Resting_HR":scaler_Resting_HR_presence.transform(df[["Resting_HR"]])[:, 0]
         })    
         pred = model_presence.predict(df_transformed)
-        result = result_target_presence.inverse_transform(pred)[0]
-        return {"prediction": result}
+        result_presence = result_target_presence.inverse_transform(pred)[0]
+        return {"prediction": result_presence}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
