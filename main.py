@@ -129,8 +129,7 @@ def predict_risk(data: RiskInput):
             "Resting_HR":scaler_Resting_HR_risk.transform(df[["Resting_HR"]])[:, 0]
         })
         df_transformed = df_transformed[features_order_risk]
-        df_transformed = df_transformed.astype(np.float64)
-
+        
         pred = model_risk.predict(df_transformed)
         result_risk = result_target_risk.inverse_transform(pred)[0]
         return {"prediction_risk": result_risk}
@@ -159,7 +158,6 @@ def predict_presence(data: PresenceInput):
             "Resting_HR":scaler_Resting_HR_presence.transform(df[["Resting_HR"]])[:, 0]
         })
         df_transformed = df_transformed[features_order_presence]
-        df_transformed = df_transformed.astype(np.float64)
                     
         pred = model_presence.predict(df_transformed)
         result_presence = result_target_presence.inverse_transform(pred)[0]
