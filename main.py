@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import gdown
 from fastapi import FastAPI, HTTPException
@@ -63,6 +64,12 @@ scaler_Diastolic_BP_risk = load("modeling/scaler_risk_Diastolic_BP.joblib")
 scaler_Systolic_BP_risk = load("modeling/scaler_risk_Systolic_BP.joblib")
 scaler_Resting_HR_risk = load("modeling/scaler_risk_Resting_HR.joblib")
 
+with open("features_order_risk.json", "r") as f:
+    features_order_risk = json.load(f)
+
+with open("features_order_presence.json", "r") as f:
+    features_order_presence = json.load(f)
+
 class RiskInput(BaseModel):
     Hypertension: str
     ECG_Abnormality: str
@@ -121,9 +128,12 @@ def predict_risk(data: RiskInput):
             "Systolic_BP":scaler_Systolic_BP_risk.transform(df[["Systolic_BP"]])[:, 0],
             "Resting_HR":scaler_Resting_HR_risk.transform(df[["Resting_HR"]])[:, 0]
         })
+        df_transformed = df_transformed[features_order_risk]
+        df_transformed = df_transformed.astype(np.float64)
+
         pred = model_risk.predict(df_transformed)
         result_risk = result_target_risk.inverse_transform(pred)[0]
-        return {"prediction": result_risk}
+        return {"prediction_risk": result_risk}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -147,10 +157,13 @@ def predict_presence(data: PresenceInput):
             "Diastolic_BP":scaler_Diastolic_BP_presence.transform(df[["Diastolic_BP"]])[:, 0],
             "Systolic_BP":scaler_Systolic_BP_presence.transform(df[["Systolic_BP"]])[:, 0],
             "Resting_HR":scaler_Resting_HR_presence.transform(df[["Resting_HR"]])[:, 0]
-        })    
+        })
+        df_transformed = df_transformed[features_order_presence]
+        df_transformed = df_transformed.astype(np.float64)
+                    
         pred = model_presence.predict(df_transformed)
         result_presence = result_target_presence.inverse_transform(pred)[0]
-        return {"prediction": result_presence}
+        return {"prediction_presence": result_presence}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
