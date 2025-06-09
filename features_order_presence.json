@@ -1,14 +1,14 @@
 [
+  "Insulin_Resistance",
+  "Pulse_Pressure",
+  "Diastolic_BP",
+  "Systolic_BP",
+  "Resting_HR",
   "Hypertension",
   "ECG_Abnormality",
   "Diabetes",
   "Alcohol",
   "Previous_Stroke",
   "Family_History",
-  "CVD_Risk_Score",
-  "Insulin_Resistance",
-  "Pulse_Pressure",
-  "Diastolic_BP",
-  "Systolic_BP",
-  "Resting_HR"
+  "CVD_Risk_Score"
 ]
