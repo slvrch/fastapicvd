@@ -71,17 +71,17 @@ with open("features_order_presence.json", "r") as f:
     features_order_presence = json.load(f)
 
 class RiskInput(BaseModel):
+    Insulin_Resistance: float
+    Pulse_Pressure: float
+    Diastolic_BP: float
+    Systolic_BP: float
+    Resting_HR: float
     Hypertension: str
     ECG_Abnormality: str
     Diabetes: str
     Alcohol: str
     Previous_Stroke: str
     Family_History: str
-    Insulin_Resistance: float
-    Pulse_Pressure: float
-    Diastolic_BP: float
-    Systolic_BP: float
-    Resting_HR: float
 
 class PresenceInput(RiskInput):
     CVD_Risk_Score: str
@@ -90,6 +90,13 @@ class User(BaseModel):
     nama : str
     email: str
     no_tlp: str
+
+class PredictionRecord(BaseModel):
+    nama: str
+    email: str
+    no_tlp: str
+    target: str
+    hasil_prediksi: str
 
 @app.post("/register", response_model=Dict[str, Any])
 def register_user(user: User) -> Dict[str, Any]:
@@ -116,17 +123,17 @@ def predict_risk(data: RiskInput):
     try:
         df = pd.DataFrame([data.dict()])
         df_transformed = pd.DataFrame({
+            "Insulin_Resistance":scaler_Insulin_Resistance_risk.transform(df[["Insulin_Resistance"]])[:, 0],
+            "Pulse_Pressure":scaler_Pulse_Pressure_risk.transform(df[["Pulse_Pressure"]])[:, 0],
+            "Diastolic_BP":scaler_Diastolic_BP_risk.transform(df[["Diastolic_BP"]])[:, 0],
+            "Systolic_BP":scaler_Systolic_BP_risk.transform(df[["Systolic_BP"]])[:, 0],
+            "Resting_HR":scaler_Resting_HR_risk.transform(df[["Resting_HR"]])[:, 0],
             "Hypertension":encoder_Hypertension_risk.transform(df["Hypertension"]),
             "ECG_Abnormality":encoder_ECG_Abnormality_risk.transform(df["ECG_Abnormality"]),
             "Diabetes":encoder_Diabetes_risk.transform(df["Diabetes"]),
             "Alcohol":encoder_Alcohol_risk.transform(df["Alcohol"]),
             "Previous_Stroke":encoder_Previous_Stroke_risk.transform(df["Previous_Stroke"]),
-            "Family_History":encoder_Family_History_risk.transform(df["Family_History"]),
-            "Insulin_Resistance":scaler_Insulin_Resistance_risk.transform(df[["Insulin_Resistance"]])[:, 0],
-            "Pulse_Pressure":scaler_Pulse_Pressure_risk.transform(df[["Pulse_Pressure"]])[:, 0],
-            "Diastolic_BP":scaler_Diastolic_BP_risk.transform(df[["Diastolic_BP"]])[:, 0],
-            "Systolic_BP":scaler_Systolic_BP_risk.transform(df[["Systolic_BP"]])[:, 0],
-            "Resting_HR":scaler_Resting_HR_risk.transform(df[["Resting_HR"]])[:, 0]
+            "Family_History":encoder_Family_History_risk.transform(df["Family_History"])
         })
         df_transformed = df_transformed[features_order_risk]
         
@@ -144,18 +151,18 @@ def predict_presence(data: PresenceInput):
     try:
         df = pd.DataFrame([data.dict()])
         df_transformed = pd.DataFrame({
+            "Insulin_Resistance":scaler_Insulin_Resistance_presence.transform(df[["Insulin_Resistance"]])[:, 0],
+            "Pulse_Pressure":scaler_Pulse_Pressure_presence.transform(df[["Pulse_Pressure"]])[:, 0],
+            "Diastolic_BP":scaler_Diastolic_BP_presence.transform(df[["Diastolic_BP"]])[:, 0],
+            "Systolic_BP":scaler_Systolic_BP_presence.transform(df[["Systolic_BP"]])[:, 0],
+            "Resting_HR":scaler_Resting_HR_presence.transform(df[["Resting_HR"]])[:, 0],
             "Hypertension":encoder_Hypertension_presence.transform(df["Hypertension"]),
             "ECG_Abnormality":encoder_ECG_Abnormality_presence.transform(df["ECG_Abnormality"]),
             "Diabetes":encoder_Diabetes_presence.transform(df["Diabetes"]),
             "Alcohol":encoder_Alcohol_presence.transform(df["Alcohol"]),
             "Previous_Stroke":encoder_Previous_Stroke_presence.transform(df["Previous_Stroke"]),
             "Family_History":encoder_Family_History_presence.transform(df["Family_History"]),
-            "CVD_Risk_Score":encoder_CVD_Risk_Score_presence.transform(df["CVD_Risk_Score"]),
-            "Insulin_Resistance":scaler_Insulin_Resistance_presence.transform(df[["Insulin_Resistance"]])[:, 0],
-            "Pulse_Pressure":scaler_Pulse_Pressure_presence.transform(df[["Pulse_Pressure"]])[:, 0],
-            "Diastolic_BP":scaler_Diastolic_BP_presence.transform(df[["Diastolic_BP"]])[:, 0],
-            "Systolic_BP":scaler_Systolic_BP_presence.transform(df[["Systolic_BP"]])[:, 0],
-            "Resting_HR":scaler_Resting_HR_presence.transform(df[["Resting_HR"]])[:, 0]
+            "CVD_Risk_Score":encoder_CVD_Risk_Score_presence.transform(df["CVD_Risk_Score"])
         })
         df_transformed = df_transformed[features_order_presence]
                     
@@ -166,7 +173,7 @@ def predict_presence(data: PresenceInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/save-prediction")
-def save_prediction(data: dict):
+def save_prediction(data: PredictionRecord):
     try:
         nama = data.get("nama")
         email = data.get("email")
