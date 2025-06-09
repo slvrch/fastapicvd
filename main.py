@@ -175,18 +175,12 @@ def predict_presence(data: PresenceInput):
 @app.post("/save-prediction")
 def save_prediction(data: PredictionRecord):
     try:
-        nama = data.get("nama")
-        email = data.get("email")
-        no_tlp = data.get("no_tlp")
-        target = data.get("target")
-        hasil_prediksi = data.get("hasil_prediksi")
-
         response = supabase.table("predictions").insert({
-            "nama": nama,
-            "email": email,
-            "no_tlp": no_tlp,
-            "target": target,
-            "hasil_prediksi": hasil_prediksi,
+            "nama": data.nama,
+            "email": data.email,
+            "no_tlp": data.no_tlp,
+            "target": data.target,
+            "hasil_prediksi": data.hasil_prediksi,
             "created_at": datetime.now(timezone.utc).isoformat()
         }).execute()
 
