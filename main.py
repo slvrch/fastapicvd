@@ -186,6 +186,8 @@ def save_prediction(data: PredictionRecord):
 
         response = supabase.table("predictions").insert(payload).execute()
 
+        print("Supabase response:", response)
+
         if getattr(response, "error", None) is None:
             return {"status": "success", "message": "Prediksi berhasil disimpan."}
         else:
